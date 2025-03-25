@@ -32,6 +32,15 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+              "./assets/fonts/Nunito-Regular.ttf",
+              "./assets/fonts/Nunito-Bold.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {
