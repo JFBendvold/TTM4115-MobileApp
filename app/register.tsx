@@ -20,8 +20,7 @@ export default function Register() {
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
-                    placeholder="Email"
-                    keyboardType="email-address"
+                    placeholder="Username"
                     autoCapitalize="none"
                     placeholderTextColor="#999"
                     autoFocus
