@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DiscoverMap() {
+  // The user's location and region
   const [region, setRegion] = useState<{
     latitude: number;
     longitude: number;
     latitudeDelta: number;
     longitudeDelta: number;
   } | null>(null);
+
+  // All scooters in the area
+  const [scooters, setScooters] = useState<Array<{
+    id: number;
+    latitude: number;
+    longitude: number;
+  }> | null>(null);
   
+  // Get the user's location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -27,6 +37,23 @@ export default function DiscoverMap() {
         longitudeDelta: 0.02,
       });
     })();
+  }, []);
+
+  // Get all scooters in the area
+  useEffect(() => {
+    // TODO: Fetch scooters from the API
+    setScooters([
+      {
+        id: 1,
+        latitude: 63.41535,
+        longitude: 10.40657,
+      },
+      {
+        id: 2,
+        latitude: 63.41969,
+        longitude: 10.40276,
+      },
+    ]);
   }, []);
 
   if (!region) {
@@ -51,6 +78,21 @@ export default function DiscoverMap() {
         rotateEnabled={false}
         pitchEnabled={false}
       >
+        {scooters && scooters.map((scooter) => (
+          <Marker
+            key={scooter.id}
+            coordinate={{
+              latitude: scooter.latitude,
+              longitude: scooter.longitude,
+            }}
+            title="Scooter"
+            description={"This is scooter: " + scooter.id}
+          >
+            <View style={styles.marker}>
+              <Ionicons name="bicycle" size={24} color="black" />
+            </View>
+          </Marker>
+        ))}
       </MapView>
     </View>
   );
@@ -67,5 +109,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  marker: {
+    backgroundColor: 'white',
+    padding: 4,
+    borderRadius: 50,
+    borderWidth: 4,
+    borderColor: '#f2ffc4',
   },
 });
