@@ -1,7 +1,7 @@
 import { Text, View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function Login() {
+export default function Register() {
     return (
         <View style={styles.container}>
             <LinearGradient
@@ -14,7 +14,9 @@ export default function Login() {
                     bottom: 0,
                 }}
             />
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>
+                Register
+            </Text>
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -32,7 +34,9 @@ export default function Login() {
                 />
             </View>
             <Pressable style={styles.button} onPress={() => {alert('Login pressed')}}>
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={styles.buttonText}>
+                    Register
+                </Text>
             </Pressable>
         </View>
     );
@@ -70,7 +74,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#333',
         padding: 10,
-        borderRadius: 50,
+        borderRadius: 5,
         width: 300,
         height: 50,
         alignItems: 'center',

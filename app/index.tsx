@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 50,
     marginBottom: 18,
     width: 300,
     height: 50,
@@ -73,5 +73,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#333',
     fontSize: 18,
+    fontFamily: 'Nunito-Bold',
   },
 });
