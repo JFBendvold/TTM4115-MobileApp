@@ -1,7 +1,14 @@
 import { Text, View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router'
 
 export default function Login() {
+
+    // Handle login button press
+    const handleLogin = () => {
+        router.push('/main');
+    };
+
     return (
         <View style={styles.container}>
             <LinearGradient
@@ -31,7 +38,7 @@ export default function Login() {
                     secureTextEntry
                 />
             </View>
-            <Pressable style={styles.button} onPress={() => {alert('Login pressed')}}>
+            <Pressable style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Login</Text>
             </Pressable>
         </View>
