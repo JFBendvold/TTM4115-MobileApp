@@ -8,14 +8,35 @@ export default function Layout() {
         <Drawer.Screen
           name="index" // This is the name of the page and must match the url from root
           options={{
-            drawerLabel: 'Map',
+            drawerLabel: 'Home',
             headerShown: false,
           }}
         />
         <Drawer.Screen
           name="user" // This is the name of the page and must match the url from root
           options={{
-            drawerLabel: 'Rewards',
+            drawerLabel: 'Profile',
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="tasks"
+          options={{
+            drawerLabel: 'Tasks',
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="fix-parking"
+          options={{
+            drawerItemStyle: { display: 'none' },
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen
+          name="move-scooter"
+          options={{
+            drawerItemStyle: { display: 'none' },
             headerShown: false,
           }}
         />
