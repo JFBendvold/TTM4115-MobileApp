@@ -128,6 +128,8 @@ export default function MoveScooter() {
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         }}
+        showsUserLocation={true}
+        userInterfaceStyle="light"
       >
         <Marker
           coordinate={selectedTask!.currentLocation}
