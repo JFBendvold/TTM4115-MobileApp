@@ -1,7 +1,38 @@
 import { Text, View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { RegisterUser, VerifyUser } from '@/services/auth-service';
+import React, { useState } from 'react';
+import { router } from 'expo-router'
 
 export default function Register() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [verificationCodeSent, setVerificationCodeSent] = useState(false);
+
+    const handleRegister = async () => {
+        if (verificationCodeSent) {
+            // Verify the user with the verification code
+            try {
+                const response = await VerifyUser(username, verificationCode);
+                alert('Verification successful!');
+                // Navigate to the next screen or perform any other action
+                router.push('/main');
+            } catch (error) {
+                console.error('Verification failed:', error);
+            }
+            return;
+        }
+
+        try {
+            const response = await RegisterUser(username, password);
+            alert('Verification code: ' + response.Code);
+            setVerificationCodeSent(true);
+        } catch (error) {
+            console.error('Registration failed:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <LinearGradient
@@ -17,24 +48,42 @@ export default function Register() {
             <Text style={styles.title}>
                 Register
             </Text>
+            {!verificationCodeSent && (
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
                     placeholder="Username"
                     autoCapitalize="none"
                     placeholderTextColor="#999"
+                    value={username}
+                    onChangeText={setUsername}
                     autoFocus
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
                     placeholderTextColor="#999"
+                    value={password}
+                    onChangeText={setPassword}
                     secureTextEntry
                 />
             </View>
-            <Pressable style={styles.button} onPress={() => {alert('Login pressed')}}>
+            )}
+            {verificationCodeSent && (
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Verification Code"
+                    placeholderTextColor="#999"
+                    value={verificationCode}
+                    onChangeText={setVerificationCode}
+                    autoCapitalize='none'
+                />
+            </View>
+            )}
+            <Pressable style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>
-                    Register
+                    {verificationCodeSent ? 'Verify' : 'Register'}
                 </Text>
             </Pressable>
         </View>
