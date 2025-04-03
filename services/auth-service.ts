@@ -40,3 +40,16 @@ export async function GetNewCode(username: string) {
         throw error;
     });
 }
+
+// Get the reward for the user
+export async function GetReward(username: string) {
+    return axios.post(process.env.EXPO_PUBLIC_API_URL + '/get_user_reward', {
+        "user": username,
+    })
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        throw error;
+    });
+}

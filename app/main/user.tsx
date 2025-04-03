@@ -2,6 +2,10 @@ import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from 'expo-router';
 import MenuButton from '@/components/ui/MenuButton';
+import { GetReward } from '@/services/auth-service';
+import React, { useState, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Ride {
   date: string;
@@ -11,6 +15,36 @@ interface Ride {
 
 export default function Profile() {
   const navigation = useNavigation<DrawerNavigationProp<any>>();
+  const [username, setUsername] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number>(0);
+
+  // Fetch the username from AsyncStorage
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const storedUsername = await AsyncStorage.getItem('username');
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+    };
+    fetchUsername();
+  }, []);
+
+  // Fetch the reward data from the API
+  useFocusEffect(
+    useCallback(() => {
+      const fetchReward = async () => {
+        if (username) {
+          try {
+            const response = await GetReward(username);
+            setBalance(response.reward);
+          } catch (error) {
+            console.error('Error fetching reward data:', error);
+          }
+        }
+      };
+      fetchReward();
+    }, [username])
+  );
 
   // TODO: Fetch this data from the API
   const mockData = {
@@ -58,7 +92,7 @@ export default function Profile() {
         
         <View style={styles.walletInfo}>
           <Text style={styles.walletLabel}>In wallet:</Text>
-          <Text style={styles.walletAmount}>{mockData.walletBalance} kr</Text>
+          <Text style={styles.walletAmount}>{balance} kr</Text>
           <Text style={styles.totalEarned}>Total amount earned: {mockData.totalEarned}kr</Text>
         </View>
 
