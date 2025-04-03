@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Pressable, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation, router } from 'expo-router';
 import MenuButton from '@/components/ui/MenuButton';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import { GetTasks } from '@/services/task-service';
 
 interface MoveTask {
   id: number;
@@ -23,41 +24,47 @@ interface MoveTask {
 
 export default function MoveScooter() {
   const navigation = useNavigation<DrawerNavigationProp<any>>();
+  const [username, setUsername] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<MoveTask[]>([]);
   const [selectedTask, setSelectedTask] = useState<MoveTask | null>(null);
   const [activeTask, setActiveTask] = useState<MoveTask | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // TODO: Fetch move tasks from API
-  const mockTasks: MoveTask[] = [
-    {
-      id: 1,
-      scooterId: "SC001",
-      currentLocation: {
-        latitude: 63.41535,
-        longitude: 10.40657,
-      },
-      targetLocation: {
-        latitude: 63.41969,
-        longitude: 10.40276,
-      },
-      distance: "0.8km",
-      reward: 25,
-    },
-    {
-      id: 2,
-      scooterId: "SC002",
-      currentLocation: {
-        latitude: 63.41969,
-        longitude: 10.40276,
-      },
-      targetLocation: {
-        latitude: 63.41535,
-        longitude: 10.41657,
-      },
-      distance: "1.2km",
-      reward: 35,
-    },
-  ];
+  // Fetch tasks from the API
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await GetTasks();
+
+        // Add from scooter to target location
+        for (const task of response.tasks) {
+          const distance = measure(
+            task.currentLocation.latitude,
+            task.currentLocation.longitude,
+            task.targetLocation.latitude,
+            task.targetLocation.longitude
+          );
+          task.distance = `${distance.toFixed(0)} m`;
+        }
+        setTasks(response.tasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    }
+    fetchTasks();
+  }, []);
+
+  function measure(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    var R = 6378.137; // Radius of earth in KM
+    var dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
+    var dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return d * 1000; // meters
+  }
 
   const handleTakeTask = () => {
     Alert.alert(
@@ -206,7 +213,7 @@ export default function MoveScooter() {
           <MapContent />
         ) : (
           <FlatList
-            data={mockTasks}
+            data={tasks}
             renderItem={renderTask}
             keyExtractor={item => item.id.toString()}
             contentContainerStyle={styles.taskList}
