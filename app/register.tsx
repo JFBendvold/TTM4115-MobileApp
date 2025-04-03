@@ -1,8 +1,9 @@
 import { Text, View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { RegisterUser, VerifyUser } from '@/services/auth-service';
+import { RegisterUser, VerifyUser, GetNewCode } from '@/services/auth-service';
 import React, { useState } from 'react';
 import { router } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Register() {
     const [username, setUsername] = useState('');
@@ -19,8 +20,18 @@ export default function Register() {
                 // Navigate to the next screen or perform any other action
                 router.push('/main');
             } catch (error) {
-                console.error('Verification failed:', error);
+                alert('Verification failed. Please check your code and try again.');
+                const response = await GetNewCode(username);
+                alert('New verification code sent: ' + response.Code);
             }
+            return;
+        }
+
+        // Check if both username and password are provided
+        if (!username || !password) {
+            alert('Please enter both username and password.');
+            const response = await RegisterUser(username, password);
+            alert('Verification code: ' + response.Code);
             return;
         }
 
@@ -28,8 +39,12 @@ export default function Register() {
             const response = await RegisterUser(username, password);
             alert('Verification code: ' + response.Code);
             setVerificationCodeSent(true);
+
+            // Store the username in AsyncStorage
+            await AsyncStorage.setItem('username', username);
         } catch (error) {
-            console.error('Registration failed:', error);
+            console.error('Registration failed', error);
+            alert('Registration failed, user may already exist. Please try again.');
         }
     };
 

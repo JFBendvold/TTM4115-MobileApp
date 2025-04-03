@@ -3,6 +3,7 @@ import { StyleSheet, View, ActivityIndicator, Pressable, Text, Alert } from 'rea
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { GetScooterData } from '@/services/scooter-service';
 
 export default function DiscoverMap() {
   // The user's location and region
@@ -57,7 +58,7 @@ export default function DiscoverMap() {
 
   // Get all scooters in the area
   useEffect(() => {
-    // TODO: Fetch scooters from the API
+    /*
     setScooters([
       {
         id: 1,
@@ -70,6 +71,7 @@ export default function DiscoverMap() {
         longitude: 10.40276,
       },
     ]);
+    */
   }, []);
 
   // Handle scooter selection

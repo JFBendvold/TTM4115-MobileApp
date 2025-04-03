@@ -10,7 +10,6 @@ export async function RegisterUser(username: string, password: string) {
         return response.data;
     })
     .catch(error => {
-        console.error('Registration error:', error);
         throw error;
     });
 }
@@ -25,7 +24,19 @@ export async function VerifyUser(username: string, code: string) {
         return response.data;
     })
     .catch(error => {
-        console.error('Verification error:', error);
+        throw error;
+    });
+}
+
+// Get a new code for the user
+export async function GetNewCode(username: string) {
+    return axios.post(process.env.EXPO_PUBLIC_API_URL + '/get_verification_code', {
+        "user": username,
+    })
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
         throw error;
     });
 }
