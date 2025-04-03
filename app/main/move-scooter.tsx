@@ -5,7 +5,8 @@ import { useNavigation, router } from 'expo-router';
 import MenuButton from '@/components/ui/MenuButton';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { GetTasks } from '@/services/task-service';
+import { GetTasks, TakeTask, VerifyTask } from '@/services/task-service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MoveTask {
   id: number;
@@ -54,6 +55,21 @@ export default function MoveScooter() {
     fetchTasks();
   }, []);
 
+  // Get the username from AsyncStorage
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      } catch (error) {
+        console.error('Error fetching username:', error);
+      }
+    };
+    fetchUsername();
+  }, []);
+
   function measure(lat1: number, lon1: number, lat2: number, lon2: number): number {
     var R = 6378.137; // Radius of earth in KM
     var dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
@@ -78,7 +94,16 @@ export default function MoveScooter() {
         {
           text: "Take Task",
           onPress: () => {
-            setActiveTask(selectedTask);
+            setIsLoading(true);
+            TakeTask(selectedTask!.id.toString(), username!)
+              .then((response) => {
+                setActiveTask(selectedTask);
+                setIsLoading(false);
+              })
+              .catch((error) => {
+                console.error('Error taking task:', error);
+                setIsLoading(false);
+              });
           }
         }
       ]
@@ -87,24 +112,28 @@ export default function MoveScooter() {
 
   const handleCompleteTask = () => {
     setIsLoading(true);
-    // TODO: Replace with actual API call to verify scooter location
-    setTimeout(() => {
+
+    VerifyTask(
+      selectedTask!.id.toString(),
+      username!,
+      selectedTask!.targetLocation.latitude,
+      selectedTask!.targetLocation.longitude
+    )
+    .then((response) => {
+      Alert.alert('Task Completed', `You have completed the task! Reward: ${selectedTask?.reward} kr`);
+      setActiveTask(null);
+      setSelectedTask(null);
+      // Refresh the task list
+      GetTasks().then((response) => {
+        setTasks(response.tasks);
+        router.push('/main/user');
+      });
+    })
+    .catch((error) => {
+      console.error('Error completing task:', error);
+      Alert.alert('Error', 'Failed to complete the task. Please try again.');
       setIsLoading(false);
-      Alert.alert(
-        "Task Completed",
-        "The scooter has been successfully moved to the target location!",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setActiveTask(null);
-              setSelectedTask(null);
-              router.push('/main/tasks');
-            }
-          }
-        ]
-      );
-    }, 2000);
+    });
   };
 
   const renderTask = ({ item }: { item: MoveTask }) => (
