@@ -3,7 +3,8 @@ import { StyleSheet, View, ActivityIndicator, Pressable, Text, Alert } from 'rea
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-import { GetScooterData } from '@/services/scooter-service';
+import { GetScooterData, UnlockScooter, LockScooter } from '@/services/scooter-service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DiscoverMap() {
   // The user's location and region
@@ -19,6 +20,7 @@ export default function DiscoverMap() {
     id: number;
     latitude: number;
     longitude: number;
+    available: boolean;
   }> | null>(null);
 
   // Selected scooter
@@ -26,6 +28,7 @@ export default function DiscoverMap() {
     id: number;
     latitude: number;
     longitude: number;
+    available: boolean;
   } | null>(null);
 
   // Loading state for unlock/lock action
@@ -36,6 +39,9 @@ export default function DiscoverMap() {
 
   // Map reference
   const mapRef = useRef<MapView>(null);
+
+  // Get the username from AsyncStorage
+  const [username, setUsername] = useState<string | null>(null);
   
   // Get the user's location
   useEffect(() => {
@@ -56,28 +62,40 @@ export default function DiscoverMap() {
     })();
   }, []);
 
+  const fetchScooters = async () => {
+    try {
+      const response = await GetScooterData();
+      setScooters(response.scooters);
+    } catch (error) {
+      console.error('Error fetching scooter data:', error);
+    }
+  };
+
   // Get all scooters in the area
   useEffect(() => {
-    /*
-    setScooters([
-      {
-        id: 1,
-        latitude: 63.41535,
-        longitude: 10.40657,
-      },
-      {
-        id: 2,
-        latitude: 63.41969,
-        longitude: 10.40276,
-      },
-    ]);
-    */
+    fetchScooters();
+    // Get the username from AsyncStorage
+    const getUsername = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        setUsername(storedUsername);
+      } catch (error) {
+        console.error('Error retrieving username:', error);
+      }
+    };
+    getUsername();
   }, []);
 
   // Handle scooter selection
-  const handleScooterSelect = (scooter: { id: number; latitude: number; longitude: number }) => {
+  const handleScooterSelect = (scooter: { id: number; latitude: number; longitude: number; available: boolean }) => {
     // If a scooter is already locked, prevent selecting another one
     if (isLocked && selectedScooter?.id !== scooter.id) {
+      return;
+    }
+
+    // If the scooter is not available, prevent selecting it
+    if (!scooter.available) {
+      Alert.alert('Scooter not available', 'This scooter is currently unavailable.');
       return;
     }
     
@@ -106,10 +124,19 @@ export default function DiscoverMap() {
           {
             text: "Unlock",
             onPress: () => {
-              // TODO: Implement actual unlock functionality
-              console.log('Unlocking scooter:', selectedScooter.id);
-              setIsLocked(true);
-              setIsLoading(false);
+              UnlockScooter(selectedScooter.id, username!)
+                .then((response) => {
+                  console.log('Scooter unlocked:', response);
+                  setIsLocked(true);
+                  setIsLoading(false);
+                })
+                .catch((error) => {
+                  console.error('Error unlocking scooter:', error);
+                  Alert.alert('Unlock failed', 'An error occurred while unlocking the scooter.');
+                  fetchScooters(); // Refresh the scooter list
+                  setIsLoading(false);
+                }
+              );
             }
           }
         ]
@@ -133,10 +160,22 @@ export default function DiscoverMap() {
           {
             text: "Lock",
             onPress: () => {
-              // TODO: Implement actual lock functionality
               console.log('Locking scooter:', selectedScooter.id);
-              setIsLocked(false);
-              setIsLoading(false);
+              LockScooter(selectedScooter.id, username!)
+                .then((response) => {
+                  console.log('Scooter locked:', response);
+                  setIsLocked(false);
+                  setSelectedScooter(null);
+                  setIsLoading(false);
+                  fetchScooters(); // Refresh the scooter list
+                })
+                .catch((error) => {
+                  console.error('Error locking scooter:', error);
+                  Alert.alert('Lock failed', 'An error occurred while locking the scooter.');
+                  fetchScooters(); // Refresh the scooter list
+                  setIsLoading(false);
+                }
+              );
             }
           }
         ]
@@ -191,7 +230,8 @@ export default function DiscoverMap() {
             <View style={[
               styles.marker,
               selectedScooter?.id === scooter.id && styles.selectedMarker,
-              isLocked && selectedScooter?.id !== scooter.id && styles.disabledMarker
+              isLocked && selectedScooter?.id !== scooter.id && styles.disabledMarker,
+              !scooter.available && styles.disabledMarker,
             ]}>
               <Ionicons name="bicycle" size={24} color="black" />
             </View>
