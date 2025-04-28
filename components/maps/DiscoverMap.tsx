@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { StyleSheet, View, ActivityIndicator, Pressable, Text, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { GetScooterData, UnlockScooter, LockScooter } from '@/services/scooter-service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function DiscoverMap() {
   // The user's location and region
@@ -75,6 +76,23 @@ export default function DiscoverMap() {
   };
 
   // Get all scooters in the area
+  useFocusEffect(
+    useCallback(() => {
+    fetchScooters();
+    // Get the username from AsyncStorage
+    const getUsername = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        setUsername(storedUsername);
+      } catch (error) {
+        console.error('Error retrieving username:', error);
+      }
+    };
+    getUsername();
+
+    return () => {}
+  }, []));
+
   useEffect(() => {
     fetchScooters();
     // Get the username from AsyncStorage
