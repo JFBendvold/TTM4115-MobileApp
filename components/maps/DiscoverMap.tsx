@@ -21,6 +21,7 @@ export default function DiscoverMap() {
     latitude: number;
     longitude: number;
     available: boolean;
+    battery: number; // Battery percentage, 0-100
   }> | null>(null);
 
   // Selected scooter
@@ -29,6 +30,7 @@ export default function DiscoverMap() {
     latitude: number;
     longitude: number;
     available: boolean;
+    battery: number; // Battery percentage, 0-100
   } | null>(null);
 
   // Loading state for unlock/lock action
@@ -66,6 +68,7 @@ export default function DiscoverMap() {
     try {
       const response = await GetScooterData();
       setScooters(response.scooters);
+      console.log('Scooter data fetched:', response.scooters);
     } catch (error) {
       console.error('Error fetching scooter data:', error);
     }
@@ -92,14 +95,18 @@ export default function DiscoverMap() {
     if (isLocked && selectedScooter?.id !== scooter.id) {
       return;
     }
-
+  
     // If the scooter is not available, prevent selecting it
     if (!scooter.available) {
       Alert.alert('Scooter not available', 'This scooter is currently unavailable.');
       return;
     }
-    
-    setSelectedScooter(scooter);
+  
+    // Find the full scooter object (with battery) from the scooters array
+    const fullScooter = scooters?.find(s => s.id === scooter.id);
+    if (fullScooter) {
+      setSelectedScooter(fullScooter);
+    }
     mapRef.current?.animateToRegion({
       latitude: scooter.latitude,
       longitude: scooter.longitude,
@@ -239,6 +246,12 @@ export default function DiscoverMap() {
         ))}
       </MapView>
       {selectedScooter && (
+        <>
+        <View style={{ position: 'absolute', top: 48, right: 16, backgroundColor: 'white', padding: 10, borderRadius: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5 }}>
+          <Text style={{ color: '#333', fontSize: 16, fontFamily: 'Nunito-Bold' }}>
+            {selectedScooter.battery}%
+          </Text>
+        </View>
         <View style={styles.unlockButtonContainer}>
           <Pressable 
             style={styles.unlockButton} 
@@ -254,6 +267,7 @@ export default function DiscoverMap() {
             )}
           </Pressable>
         </View>
+        </>
       )}
     </View>
   );
