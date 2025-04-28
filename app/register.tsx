@@ -1,7 +1,53 @@
 import { Text, View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { RegisterUser, VerifyUser, GetNewCode } from '@/services/auth-service';
+import React, { useState } from 'react';
+import { router } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Register() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [verificationCodeSent, setVerificationCodeSent] = useState(false);
+
+    const handleRegister = async () => {
+        if (verificationCodeSent) {
+            // Verify the user with the verification code
+            try {
+                const response = await VerifyUser(username, verificationCode);
+                alert('Verification successful!');
+                // Navigate to the next screen or perform any other action
+                router.push('/main');
+            } catch (error) {
+                alert('Verification failed. Please check your code and try again.');
+                const response = await GetNewCode(username);
+                alert('New verification code sent: ' + response.Code);
+            }
+            return;
+        }
+
+        // Check if both username and password are provided
+        if (!username || !password) {
+            alert('Please enter both username and password.');
+            const response = await RegisterUser(username, password);
+            alert('Verification code: ' + response.Code);
+            return;
+        }
+
+        try {
+            const response = await RegisterUser(username, password);
+            alert('Verification code: ' + response.Code);
+            setVerificationCodeSent(true);
+
+            // Store the username in AsyncStorage
+            await AsyncStorage.setItem('username', username);
+        } catch (error) {
+            console.error('Registration failed', error);
+            alert('Registration failed, user may already exist. Please try again.');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <LinearGradient
@@ -17,24 +63,42 @@ export default function Register() {
             <Text style={styles.title}>
                 Register
             </Text>
+            {!verificationCodeSent && (
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
                     placeholder="Username"
                     autoCapitalize="none"
                     placeholderTextColor="#999"
+                    value={username}
+                    onChangeText={setUsername}
                     autoFocus
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Password"
                     placeholderTextColor="#999"
+                    value={password}
+                    onChangeText={setPassword}
                     secureTextEntry
                 />
             </View>
-            <Pressable style={styles.button} onPress={() => {alert('Login pressed')}}>
+            )}
+            {verificationCodeSent && (
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Verification Code"
+                    placeholderTextColor="#999"
+                    value={verificationCode}
+                    onChangeText={setVerificationCode}
+                    autoCapitalize='none'
+                />
+            </View>
+            )}
+            <Pressable style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>
-                    Register
+                    {verificationCodeSent ? 'Verify' : 'Register'}
                 </Text>
             </Pressable>
         </View>
