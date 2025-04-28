@@ -1,50 +1,57 @@
-# Welcome to your Expo app 👋
+# Expo Project README
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This explains how to install the necessary dependencies and run this Expo project locally for development and testing.
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
+Before you begin, ensure you have the following installed on your system:
 
-   ```bash
-   npm install
-   ```
+* **Node.js:** Expo projects require Node.js. You can download it from [https://nodejs.org/](https://nodejs.org/). npm (Node Package Manager) is included with Node.js.
+* **Expo Go App:** You need the Expo Go app installed on your iOS or Android device to view the project while it's running.
+    * [Download for iOS](https://apps.apple.com/us/app/expo-go/id982107779)
+    * [Download for Android](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
-2. Start the app
+## Installation
 
-   ```bash
-    npx expo start
-   ```
+1.  **Clone the repository (if applicable):**
+    ```bash
+    git clone <your-repository-url>
+    cd <project-directory>
+    ```
 
-In the output, you'll find options to open the app in a
+2.  **Install dependencies:** Navigate to the project's root directory in your terminal and run the following command to install all the required packages:
+    ```bash
+    npm install
+    ```
+    This command reads the `package.json` file and downloads the necessary libraries into the `node_modules` folder.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Running the Project
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+1.  **Start the development server:** Once the dependencies are installed, run the following command in the project's root directory:
+    ```bash
+    npm run start
+    ```
+    Alternatively, you might use `npx expo start`. Both commands typically achieve the same result in modern Expo projects.
 
-## Get a fresh project
+2.  **Open in Expo Go:** After running the start command, a QR code will appear in your terminal and possibly open in your web browser (Metro Bundler).
+    * Open the Expo Go app on your mobile device.
+    * Scan the QR code displayed in the terminal or the Metro Bundler page using the Expo Go app.
+    * Ensure your mobile device is connected to the **same Wi-Fi network** as your computer.
 
-When you're ready, run:
+The app should now load and run inside the Expo Go app on your device. Any changes you make to the project code will automatically reload the app.
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Happy coding!
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+  @media print {
+    .ms-editor-squiggler {
+        display:none !important;
+    }
+  }
+  .ms-editor-squiggler {
+    all: initial;
+    display: block !important;
+    height: 0px !important;
+    width: 0px !important;
+  }
