@@ -13,13 +13,7 @@ Before you begin, ensure you have the following installed on your system:
 
 ## Installation
 
-1.  **Clone the repository (if applicable):**
-    ```bash
-    git clone <your-repository-url>
-    cd <project-directory>
-    ```
-
-2.  **Install dependencies:** Navigate to the project's root directory in your terminal and run the following command to install all the required packages:
+1.  **Install dependencies:** Navigate to the project's root directory in your terminal and run the following command to install all the required packages:
     ```bash
     npm install
     ```
@@ -39,19 +33,3 @@ Before you begin, ensure you have the following installed on your system:
     * Ensure your mobile device is connected to the **same Wi-Fi network** as your computer.
 
 The app should now load and run inside the Expo Go app on your device. Any changes you make to the project code will automatically reload the app.
-
----
-
-Happy coding!
-
-  @media print {
-    .ms-editor-squiggler {
-        display:none !important;
-    }
-  }
-  .ms-editor-squiggler {
-    all: initial;
-    display: block !important;
-    height: 0px !important;
-    width: 0px !important;
-  }
